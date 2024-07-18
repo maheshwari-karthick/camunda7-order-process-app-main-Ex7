@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @Component
 @ExternalTaskSubscription("creditCardCharging")
 public class CreditCardHandler implements ExternalTaskHandler {
@@ -28,10 +31,16 @@ public class CreditCardHandler implements ExternalTaskHandler {
         String expiryDate = externalTask.getVariable("expiryDate");
         Double openAmount = externalTask.getVariable("openAmount");
 
-        service.chargeAmount(cardNumber, cvc, expiryDate, openAmount);
+        try {
+            service.chargeAmount(cardNumber, cvc, expiryDate, openAmount);
 
-        externalTaskService.complete(externalTask);
+            externalTaskService.complete(externalTask);
 
+        } catch (IllegalArgumentException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            externalTaskService.handleFailure(externalTask, "credit card expired", sw.toString(), 0, 0);
+        }
     }
 
 }

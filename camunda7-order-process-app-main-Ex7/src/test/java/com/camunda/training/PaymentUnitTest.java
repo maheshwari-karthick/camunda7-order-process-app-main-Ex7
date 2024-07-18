@@ -26,7 +26,10 @@ public class PaymentUnitTest {
         assertThat(processInstance).isWaitingAt(findId("Charge credit card")).externalTask().hasTopicName("creditCardCharging");
 
         complete(externalTask(), withVariables("cardNumber", "1234 5678", "CVC", "123", "expiryDate", "09/24", "openAmount", 45.99));
-        assertThat(processInstance).isEnded().hasPassed(findId("Payment completed"));
+        assertThat(processInstance).isWaitingAt(findId("Payment completed")).externalTask()
+                .hasTopicName("paymentCompletion");
+
+        complete(externalTask());
     }
 
     @Test
@@ -38,8 +41,10 @@ public class PaymentUnitTest {
         complete(externalTask(), withVariables("openAmount", 0.0, "customerCredit", 14.11));
         assertThat(processInstance).variables().contains(entry("openAmount", 0.0), entry("customerCredit", 14.11));
 
-        assertThat(processInstance).isEnded().hasPassed(findId("Payment completed"));
+        assertThat(processInstance).isWaitingAt(findId("Payment completed")).externalTask()
+                .hasTopicName("paymentCompletion");
 
+        complete(externalTask());
     }
 
 }
