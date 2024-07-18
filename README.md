@@ -1,2 +1,3 @@
-# camunda7-order-process-app-main-Ex7
-camunda7-order-process-app-main-Ex7
+# Order-Process-App
+
+Template for the Camunda Platform 7 for Java Developers Training.
